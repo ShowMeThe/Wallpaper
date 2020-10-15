@@ -6,10 +6,4 @@ public interface IWrapper {
 
     void initMediaSource(SurfaceHolder holder);
 
-    void start();
-
-    void pause();
-
-    void destroy();
-
 }

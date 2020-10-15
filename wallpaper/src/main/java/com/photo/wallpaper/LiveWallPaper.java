@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.service.wallpaper.WallpaperService;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -14,6 +15,7 @@ import androidx.annotation.FloatRange;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static com.photo.wallpaper.Const.ACTION_VOICE;
 import static com.photo.wallpaper.Const.WALLPAPER_ACTION;
@@ -22,12 +24,14 @@ public class LiveWallPaper extends WallpaperService {
 
     private static final String TAG = "LiveWallPaper";
 
-    private boolean created = false;
+    public static boolean created = false;
 
     @Override
     public Engine onCreateEngine() {
         return new WallpaperEngine();
     }
+
+    private  MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
 
     public void volume(@FloatRange(from = 0.0,to = 1.0) float volume){
         Intent intent = new Intent();
@@ -36,18 +40,42 @@ public class LiveWallPaper extends WallpaperService {
         getApplicationContext().sendBroadcast(intent);
     }
 
-    public void setWallPaper(Context context,File videoPath) throws IOException {
-        MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
+
+
+    public void setLiveVideoWallpaper(Context context,File videoPath) {
         wrapper.setPlayingFile(videoPath);
+        wrapper.setMediaType(MediaPlayerWrapper.MediaType.VIDEO);
+        createActivity(context);
+    }
+
+    public void setImageWallPaper(Context context, InputStream imageFile) {
+        wrapper.setPhotoInput(imageFile);
+        wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
+        createActivity(context);
+    }
+
+    public void setImageWallPaper(Context context, Bitmap imageFile) {
+        wrapper.setPhotoInput(imageFile);
+        wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
+        createActivity(context);
+    }
+
+    public void setImageWallPaper(Context context,File imageFile) {
+        wrapper.setPhotoInput(imageFile);
+        wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
+        createActivity(context);
+    }
+
+
+    private void createActivity(Context context){
+        Log.e(TAG,"createActivity " + created + " holder " + wrapper.holder);
         if(!created){
             created = true;
             Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
             intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,new ComponentName(context,LiveWallPaper.class));
             context.startActivity(intent);
         }else {
-            wrapper.destroy();
             wrapper.initMediaSource(wrapper.holder);
-            wrapper.start();
         }
     }
 
@@ -68,29 +96,43 @@ public class LiveWallPaper extends WallpaperService {
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
-            Log.e(TAG,"onVisibilityChanged");
+        }
+
+
+        @Override
+        public void onSurfaceCreated(SurfaceHolder holder) {
+            Log.e(TAG,"onSurfaceCreated " + holder);
+            super.onSurfaceCreated(holder);
+            wrapper.initMediaSource(holder);
+        }
+
+        @Override
+        public void onSurfaceRedrawNeeded(SurfaceHolder holder) {
+            super.onSurfaceRedrawNeeded(holder);
+            Log.e(TAG,"onSurfaceRedrawNeeded  " + holder);
 
         }
 
         @Override
-        public void onSurfaceCreated(SurfaceHolder holder) {
-            Log.e(TAG,"onSurfaceCreated");
-            super.onSurfaceCreated(holder);
-            wrapper.initMediaSource(holder);
-            wrapper.start();
+        public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            super.onSurfaceChanged(holder, format, width, height);
+            Log.e(TAG,"onSurfaceChanged  " + holder);
+
         }
 
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
-            Log.e(TAG,"onSurfaceDestroyed");
+            Log.e(TAG,"onSurfaceDestroyed  " + holder);
             super.onSurfaceDestroyed(holder);
-            //wrapper.destroy();
+
         }
 
         @Override
         public void onDestroy() {
+            Log.e(TAG,"onDestroy");
             super.onDestroy();
             unregisterReceiver(receiver);
+            //created = false;
         }
 
         public class VideoReceiver extends BroadcastReceiver{
