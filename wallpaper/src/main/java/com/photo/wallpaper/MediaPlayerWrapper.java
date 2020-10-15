@@ -3,40 +3,35 @@ package com.photo.wallpaper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-
-import androidx.annotation.NonNull;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 
 public class MediaPlayerWrapper implements IWrapper {
 
 
     enum MediaType {
-        PHOTO, VIDEO
+        DEFAULT,PHOTO, VIDEO
     }
 
 
-    private MediaType mediaType;
+    private MediaType mediaType = MediaType.DEFAULT;
 
     private MediaPlayerWrapper() {
-        surfaceView = new WeakReference<>(new SurfaceView(WallpaperClient.getClient().getContext().get()));
+
+    }
+
+    public MediaType getMediaType() {
+        return mediaType;
+    }
+
+    public MediaPlayer getPlayer() {
+        return player;
     }
 
     private MediaPlayer player;
@@ -59,11 +54,7 @@ public class MediaPlayerWrapper implements IWrapper {
 
     private File playingFile;
 
-    private InputStream photoInput;
-
     private Bitmap liveBitmap;
-
-    private WeakReference<SurfaceView> surfaceView;
 
     private Paint paint;
 
@@ -99,35 +90,32 @@ public class MediaPlayerWrapper implements IWrapper {
         player.setVolume(volume, volume);
     }
 
+
+
     @Override
-    public void initMediaSource(SurfaceHolder holder) {
+    public void initMediaSource(final SurfaceHolder holder) {
         this.holder = holder;
-        if (player != null && player.isPlaying()) {
+        if(player!=null){
             player.reset();
             player.release();
             player = null;
         }
         if (playingFile != null && mediaType == MediaType.VIDEO) {
             player = new MediaPlayer();
-
             player.setSurface(this.holder.getSurface());
             try {
                 player.setDataSource(playingFile.getPath());
                 player.setLooping(true);
                 player.setVolume(0f, 0f);
-                player.prepareAsync();
-                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mediaPlayer) {
-                        player.start();
-                    }
-                });
+                player.prepare();
+                player.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (mediaType == MediaType.PHOTO) {
             if (liveBitmap != null) {
-                Rect rect = new Rect(0, 0, WallpaperClient.getClient().getSCREEN_WIDTH(), WallpaperClient.getClient().getSCREEN_HEIGHT());
+                Rect rect = new Rect(0, 0,
+                        WallpaperClient.getClient().getSCREEN_WIDTH(), WallpaperClient.getClient().getSCREEN_HEIGHT());
                 Canvas canvas = holder.lockCanvas(rect);
                 if (paint == null) {
                     paint = new Paint();
@@ -137,4 +125,7 @@ public class MediaPlayerWrapper implements IWrapper {
             }
         }
     }
+
+
 }
+

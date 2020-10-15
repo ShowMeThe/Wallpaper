@@ -24,62 +24,78 @@ public class LiveWallPaper extends WallpaperService {
 
     private static final String TAG = "LiveWallPaper";
 
-    public static boolean created = false;
+    public static boolean surfaceInitialized = false;
 
     @Override
     public Engine onCreateEngine() {
         return new WallpaperEngine();
     }
 
-    private  MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
+    private MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
 
-    public void volume(@FloatRange(from = 0.0,to = 1.0) float volume){
+    public void volume(@FloatRange(from = 0.0, to = 1.0) float volume) {
         Intent intent = new Intent();
         intent.setAction(WALLPAPER_ACTION);
-        intent.putExtra(ACTION_VOICE,volume);
+        intent.putExtra(ACTION_VOICE, volume);
         getApplicationContext().sendBroadcast(intent);
     }
 
 
-
-    public void setLiveVideoWallpaper(Context context,File videoPath) {
+    public void setLiveVideoWallpaper(Context context, File videoPath) {
         wrapper.setPlayingFile(videoPath);
+        boolean needFlag = wrapper.getMediaType() == MediaPlayerWrapper.MediaType.VIDEO;
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.VIDEO);
-        createActivity(context);
+        createActivity(context,needFlag);
     }
+
 
     public void setImageWallPaper(Context context, InputStream imageFile) {
         wrapper.setPhotoInput(imageFile);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        createActivity(context);
+        boolean needFlag = wrapper.getMediaType() == MediaPlayerWrapper.MediaType.VIDEO;
+        createActivity(context,needFlag);
     }
 
     public void setImageWallPaper(Context context, Bitmap imageFile) {
         wrapper.setPhotoInput(imageFile);
+        boolean needFlag = wrapper.getMediaType() == MediaPlayerWrapper.MediaType.VIDEO;
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        createActivity(context);
+        createActivity(context,needFlag);
     }
 
-    public void setImageWallPaper(Context context,File imageFile) {
+    public void setImageWallPaper(Context context, File imageFile) {
         wrapper.setPhotoInput(imageFile);
+        boolean needFlag = wrapper.getMediaType() == MediaPlayerWrapper.MediaType.VIDEO;
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        createActivity(context);
+        createActivity(context, needFlag);
     }
 
 
-    private void createActivity(Context context){
-        Log.e(TAG,"createActivity " + created + " holder " + wrapper.holder);
-        if(!created){
-            created = true;
+    private void createActivity(Context context, boolean lastFlagIsVideo) {
+        MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
+        if(!surfaceInitialized){
+            //未启动
             Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-            intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,new ComponentName(context,LiveWallPaper.class));
+            intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(context, LiveWallPaper.class));
             context.startActivity(intent);
         }else {
-            wrapper.initMediaSource(wrapper.holder);
+            //已启动
+            if(lastFlagIsVideo){
+                wrapper.initMediaSource(wrapper.holder);
+            }else {
+                try {
+                    WallpaperManager.getInstance(context).clear();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+                intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(context, LiveWallPaper.class));
+                context.startActivity(intent);
+            }
         }
     }
 
-    private class WallpaperEngine extends Engine{
+    private class WallpaperEngine extends Engine {
         private MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
         private VideoReceiver receiver;
 
@@ -89,7 +105,7 @@ public class LiveWallPaper extends WallpaperService {
             super.onCreate(surfaceHolder);
             IntentFilter intentFilter = new IntentFilter(WALLPAPER_ACTION);
             receiver = new VideoReceiver();
-            registerReceiver(receiver,intentFilter);
+            registerReceiver(receiver, intentFilter);
         }
 
 
@@ -101,7 +117,8 @@ public class LiveWallPaper extends WallpaperService {
 
         @Override
         public void onSurfaceCreated(SurfaceHolder holder) {
-            Log.e(TAG,"onSurfaceCreated " + holder);
+            surfaceInitialized = true;
+            Log.e(TAG, "onSurfaceCreated " + holder);
             super.onSurfaceCreated(holder);
             wrapper.initMediaSource(holder);
         }
@@ -109,40 +126,39 @@ public class LiveWallPaper extends WallpaperService {
         @Override
         public void onSurfaceRedrawNeeded(SurfaceHolder holder) {
             super.onSurfaceRedrawNeeded(holder);
-            Log.e(TAG,"onSurfaceRedrawNeeded  " + holder);
+            Log.e(TAG, "onSurfaceRedrawNeeded  " + holder);
 
         }
 
         @Override
         public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             super.onSurfaceChanged(holder, format, width, height);
-            Log.e(TAG,"onSurfaceChanged  " + holder);
+            Log.e(TAG, "onSurfaceChanged  " + holder);
 
         }
 
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
-            Log.e(TAG,"onSurfaceDestroyed  " + holder);
+            Log.e(TAG, "onSurfaceDestroyed  " + holder);
             super.onSurfaceDestroyed(holder);
 
         }
 
         @Override
         public void onDestroy() {
-            Log.e(TAG,"onDestroy");
+            Log.e(TAG, "onDestroy");
             super.onDestroy();
             unregisterReceiver(receiver);
-            //created = false;
         }
 
-        public class VideoReceiver extends BroadcastReceiver{
+        public class VideoReceiver extends BroadcastReceiver {
 
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 assert action != null;
-                if(action.equals(WALLPAPER_ACTION)){
-                    float volume = intent.getFloatExtra(ACTION_VOICE,0.0f);
+                if (action.equals(WALLPAPER_ACTION)) {
+                    float volume = intent.getFloatExtra(ACTION_VOICE, 0.0f);
                     MediaPlayerWrapper.getInstant().volume(volume);
                 }
             }

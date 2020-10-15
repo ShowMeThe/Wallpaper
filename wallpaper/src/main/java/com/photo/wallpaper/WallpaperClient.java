@@ -53,6 +53,7 @@ public class WallpaperClient {
         this.context = new WeakReference<>(context);
         manager = WallpaperManager.getInstance(context);
         wallPaper = new LiveWallPaper();
+        getScreenWH(context);
     }
 
     private void getScreenWH(Context context){
