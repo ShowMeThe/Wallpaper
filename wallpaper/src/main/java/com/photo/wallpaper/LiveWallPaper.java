@@ -73,6 +73,9 @@ public class LiveWallPaper extends WallpaperService {
 
     private void createActivity(Context context, boolean lastFlagIsVideo) {
         MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
+        if(wrapper.holder == null || !wrapper.holder.getSurface().isValid()){
+            surfaceInitialized = false;
+        }
         if(!surfaceInitialized){
             //未启动
             Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
