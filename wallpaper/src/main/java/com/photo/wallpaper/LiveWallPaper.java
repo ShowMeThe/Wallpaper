@@ -43,35 +43,31 @@ public class LiveWallPaper extends WallpaperService {
 
     public void setLiveVideoWallpaper(Context context, File videoPath) {
         wrapper.setPlayingFile(videoPath);
-        boolean needFlag = wrapper.getMediaType() == MediaPlayerWrapper.MediaType.VIDEO;
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.VIDEO);
-        createActivity(context,needFlag);
+        createActivity(context);
     }
 
 
     public void setImageWallPaper(Context context, InputStream imageFile) {
         wrapper.setPhotoInput(imageFile);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        boolean needFlag = wrapper.getMediaType() == MediaPlayerWrapper.MediaType.VIDEO;
-        createActivity(context,needFlag);
+        createActivity(context);
     }
 
     public void setImageWallPaper(Context context, Bitmap imageFile) {
         wrapper.setPhotoInput(imageFile);
-        boolean needFlag = wrapper.getMediaType() == MediaPlayerWrapper.MediaType.VIDEO;
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        createActivity(context,needFlag);
+        createActivity(context);
     }
 
     public void setImageWallPaper(Context context, File imageFile) {
         wrapper.setPhotoInput(imageFile);
-        boolean needFlag = wrapper.getMediaType() == MediaPlayerWrapper.MediaType.VIDEO;
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        createActivity(context, needFlag);
+        createActivity(context);
     }
 
 
-    private void createActivity(Context context, boolean lastFlagIsVideo) {
+    private void createActivity(Context context) {
         MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
         if(wrapper.holder == null || !wrapper.holder.getSurface().isValid()){
             surfaceInitialized = false;
