@@ -83,18 +83,7 @@ public class LiveWallPaper extends WallpaperService {
             context.startActivity(intent);
         }else {
             //已启动
-            if(lastFlagIsVideo){
-                wrapper.initMediaSource(wrapper.holder);
-            }else {
-                try {
-                    WallpaperManager.getInstance(context).clear();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-                intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(context, LiveWallPaper.class));
-                context.startActivity(intent);
-            }
+            wrapper.initMediaSource(wrapper.holder);
         }
     }
 

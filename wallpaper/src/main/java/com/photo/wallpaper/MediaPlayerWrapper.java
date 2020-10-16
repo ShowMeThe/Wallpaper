@@ -8,6 +8,8 @@ import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.view.SurfaceHolder;
 
+import com.photo.wallpaper.egl.EGLPosterRenderer;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,14 +116,8 @@ public class MediaPlayerWrapper implements IWrapper {
             }
         } else if (mediaType == MediaType.PHOTO) {
             if (liveBitmap != null) {
-                Rect rect = new Rect(0, 0,
-                        WallpaperClient.getClient().getSCREEN_WIDTH(), WallpaperClient.getClient().getSCREEN_HEIGHT());
-                Canvas canvas = holder.lockCanvas(rect);
-                if (paint == null) {
-                    paint = new Paint();
-                }
-                canvas.drawBitmap(liveBitmap, new Rect(0, 0, liveBitmap.getWidth(), liveBitmap.getHeight()), rect, paint);
-                holder.unlockCanvasAndPost(canvas);
+                EGLPosterRenderer.render(liveBitmap)
+                        .recycleBitmap(false).into(this.holder.getSurface());
             }
         }
     }
