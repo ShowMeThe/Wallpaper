@@ -77,37 +77,37 @@ public class WallpaperClient {
         return context;
     }
 
-    public void setLiveImageWallpaper(@NonNull File file){
+    public void setLiveImageWallpaper(@NonNull File file,ICallBack callBack){
         checkInit();
         try {
-            wallPaper.setImageWallPaper(context.get(),file);
+            wallPaper.setImageWallPaper(context.get(),file,callBack);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setLiveImageWallpaper(@NonNull Bitmap file){
+    public void setLiveImageWallpaper(@NonNull Bitmap file,ICallBack callBack){
         checkInit();
         try {
-            wallPaper.setImageWallPaper(context.get(),file);
+            wallPaper.setImageWallPaper(context.get(),file,callBack);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setLiveImageWallpaper(@NonNull InputStream file){
+    public void setLiveImageWallpaper(@NonNull InputStream file,ICallBack callBack){
         checkInit();
         try {
-            wallPaper.setImageWallPaper(context.get(),file);
+            wallPaper.setImageWallPaper(context.get(),file,callBack);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setLiveVideoWallpaper(@NonNull File file){
+    public void setLiveVideoWallpaper(@NonNull File file,ICallBack callBack){
         checkInit();
         try {
-            wallPaper.setLiveVideoWallpaper(context.get(),file);
+            wallPaper.setLiveVideoWallpaper(context.get(),file,callBack);
         } catch (Exception e) {
             e.printStackTrace();
         }

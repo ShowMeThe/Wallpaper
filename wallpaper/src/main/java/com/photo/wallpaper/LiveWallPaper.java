@@ -41,33 +41,33 @@ public class LiveWallPaper extends WallpaperService {
     }
 
 
-    public void setLiveVideoWallpaper(Context context, File videoPath) {
+    public void setLiveVideoWallpaper(Context context, File videoPath,ICallBack callBack) {
         wrapper.setPlayingFile(videoPath);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.VIDEO);
-        createActivity(context);
+        createActivity(context,callBack);
     }
 
 
-    public void setImageWallPaper(Context context, InputStream imageFile) {
+    public void setImageWallPaper(Context context, InputStream imageFile,ICallBack callBack) {
         wrapper.setPhotoInput(imageFile);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        createActivity(context);
+        createActivity(context,callBack);
     }
 
-    public void setImageWallPaper(Context context, Bitmap imageFile) {
+    public void setImageWallPaper(Context context, Bitmap imageFile,ICallBack callBack) {
         wrapper.setPhotoInput(imageFile);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        createActivity(context);
+        createActivity(context,callBack);
     }
 
-    public void setImageWallPaper(Context context, File imageFile) {
+    public void setImageWallPaper(Context context, File imageFile,ICallBack callBack) {
         wrapper.setPhotoInput(imageFile);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
-        createActivity(context);
+        createActivity(context,callBack);
     }
 
 
-    private void createActivity(Context context) {
+    private void createActivity(Context context,ICallBack callBack) {
         MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
         if(wrapper.holder == null || !wrapper.holder.getSurface().isValid()){
             surfaceInitialized = false;
@@ -80,6 +80,7 @@ public class LiveWallPaper extends WallpaperService {
         }else {
             //已启动
             wrapper.initMediaSource(wrapper.holder);
+            callBack.onCalled();
         }
     }
 
