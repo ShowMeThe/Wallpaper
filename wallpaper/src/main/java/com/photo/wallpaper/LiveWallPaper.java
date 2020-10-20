@@ -1,5 +1,6 @@
 package com.photo.wallpaper;
 
+import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -12,26 +13,33 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.FloatRange;
+import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static com.photo.wallpaper.Const.ACTION_VOICE;
 import static com.photo.wallpaper.Const.WALLPAPER_ACTION;
+import static com.photo.wallpaper.Constant.livePaper_requestCode;
 
 public class LiveWallPaper extends WallpaperService {
+
 
     private static final String TAG = "LiveWallPaper";
 
     public static boolean surfaceInitialized = false;
+
+
 
     @Override
     public Engine onCreateEngine() {
         return new WallpaperEngine();
     }
 
-    private MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
+    private  MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
 
     public void volume(@FloatRange(from = 0.0, to = 1.0) float volume) {
         Intent intent = new Intent();
@@ -41,33 +49,33 @@ public class LiveWallPaper extends WallpaperService {
     }
 
 
-    public void setLiveVideoWallpaper(Context context, File videoPath) {
+    public void setLiveVideoWallpaper(Activity context, File videoPath) {
         wrapper.setPlayingFile(videoPath);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.VIDEO);
         createActivity(context);
     }
 
 
-    public void setImageWallPaper(Context context, InputStream imageFile) {
+    public void setImageWallPaper(Activity context, InputStream imageFile) {
         wrapper.setPhotoInput(imageFile);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
         createActivity(context);
     }
 
-    public void setImageWallPaper(Context context, Bitmap imageFile) {
+    public void setImageWallPaper(Activity context, Bitmap imageFile) {
         wrapper.setPhotoInput(imageFile);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
         createActivity(context);
     }
 
-    public void setImageWallPaper(Context context, File imageFile) {
+    public void setImageWallPaper(Activity context, File imageFile) {
         wrapper.setPhotoInput(imageFile);
         wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
         createActivity(context);
     }
 
 
-    private void createActivity(Context context) {
+    private void createActivity(Activity context) {
         MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
         if(wrapper.holder == null || !wrapper.holder.getSurface().isValid()){
             surfaceInitialized = false;
@@ -76,7 +84,52 @@ public class LiveWallPaper extends WallpaperService {
             //未启动
             Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
             intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(context, LiveWallPaper.class));
-            context.startActivity(intent);
+            context.startActivityForResult(intent,livePaper_requestCode);
+        }else {
+            //已启动
+            if(WallpaperClient.getClient().getLivePaperCallBack()!=null){
+                WallpaperClient.getClient().getLivePaperCallBack().onSuccess();
+            }
+            wrapper.initMediaSource(wrapper.holder);
+        }
+    }
+
+
+    public void setLiveVideoWallpaper(Fragment context, File videoPath) {
+        wrapper.setPlayingFile(videoPath);
+        wrapper.setMediaType(MediaPlayerWrapper.MediaType.VIDEO);
+        createFragment(context);
+    }
+
+
+    public void setImageWallPaper(Fragment context, InputStream imageFile) {
+        wrapper.setPhotoInput(imageFile);
+        wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
+        createFragment(context);
+    }
+
+    public void setImageWallPaper(Fragment context, Bitmap imageFile) {
+        wrapper.setPhotoInput(imageFile);
+        wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
+        createFragment(context);
+    }
+
+    public void setImageWallPaper(Fragment context, File imageFile) {
+        wrapper.setPhotoInput(imageFile);
+        wrapper.setMediaType(MediaPlayerWrapper.MediaType.PHOTO);
+        createFragment(context);
+    }
+
+    private void createFragment(Fragment fragment) {
+        MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
+        if(wrapper.holder == null || !wrapper.holder.getSurface().isValid()){
+            surfaceInitialized = false;
+        }
+        if(!surfaceInitialized){
+            //未启动
+            Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+            intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(fragment.requireContext(), LiveWallPaper.class));
+            fragment.startActivityForResult(intent,livePaper_requestCode);
         }else {
             //已启动
             wrapper.initMediaSource(wrapper.holder);

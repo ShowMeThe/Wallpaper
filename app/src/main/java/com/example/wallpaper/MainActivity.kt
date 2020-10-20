@@ -1,10 +1,13 @@
 package com.example.wallpaper
 
 import android.app.WallpaperManager
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.photo.wallpaper.LivePaperCallBack
 import com.photo.wallpaper.WallpaperClient
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
@@ -20,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         manager.doInitFirst(this)
 
         btn.setOnClickListener {
-            manager.setLiveImageWallpaper(
+            manager.setLiveImageWallpaper(this,
                 BitmapFactory.decodeResource(
                     resources,
                     R.mipmap.wallpaper
@@ -37,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             val videoFile = File(fileDir.path + File.separator + "1.mp4")
             val writer = videoFile.outputStream().buffered()
             writer.write(assetFile.readBytes())
-            manager.setLiveVideoWallpaper(videoFile)
+            manager.setLiveVideoWallpaper(this,videoFile)
         }
 
         btn3.setOnClickListener {
@@ -49,7 +52,7 @@ class MainActivity : AppCompatActivity() {
             val videoFile = File(fileDir.path + File.separator + "2.mp4")
             val writer = videoFile.outputStream().buffered()
             writer.write(assetFile.readBytes())
-            manager.setLiveVideoWallpaper(videoFile)
+            manager.setLiveVideoWallpaper(this,videoFile)
         }
 
         btn4.setOnClickListener {
@@ -60,5 +63,22 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        manager.setLivePaperCallBack(object : LivePaperCallBack{
+            override fun onSuccess() {
+                Log.e("22222222","onSuccess")
+            }
+
+            override fun onFailed() {
+                Log.e("22222222","onFailed")
+            }
+
+        })
+
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        WallpaperClient.onActivityResult(requestCode, resultCode, data)
+    }
+
 }

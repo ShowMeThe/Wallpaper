@@ -1,17 +1,24 @@
 package com.photo.wallpaper;
 
+import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+import static com.photo.wallpaper.Constant.livePaper_requestCode;
 
 public class WallpaperClient {
 
@@ -56,6 +63,29 @@ public class WallpaperClient {
         getScreenWH(context);
     }
 
+
+    private LivePaperCallBack livePaperCallBack;
+
+    public LivePaperCallBack getLivePaperCallBack() {
+        return livePaperCallBack;
+    }
+
+    public void setLivePaperCallBack(LivePaperCallBack livePaperCallBack) {
+        this.livePaperCallBack = livePaperCallBack;
+    }
+
+
+    public static void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(client.livePaperCallBack!=null){
+            if(requestCode == livePaper_requestCode && resultCode == RESULT_OK){
+                client.livePaperCallBack.onSuccess();
+            }else if(requestCode == livePaper_requestCode && resultCode == RESULT_CANCELED){
+                client.livePaperCallBack.onFailed();
+            }
+        }
+
+    }
+
     private void getScreenWH(Context context){
         Resources resources = context.getResources();
         DisplayMetrics dm = resources.getDisplayMetrics();
@@ -77,37 +107,74 @@ public class WallpaperClient {
         return context;
     }
 
-    public void setLiveImageWallpaper(@NonNull File file){
+    public void setLiveImageWallpaper(Activity context,@NonNull File file){
         checkInit();
         try {
-            wallPaper.setImageWallPaper(context.get(),file);
+            wallPaper.setImageWallPaper(context,file);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setLiveImageWallpaper(@NonNull Bitmap file){
+    public void setLiveImageWallpaper(Activity context,@NonNull Bitmap file){
         checkInit();
         try {
-            wallPaper.setImageWallPaper(context.get(),file);
+            wallPaper.setImageWallPaper(context,file);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setLiveImageWallpaper(@NonNull InputStream file){
+    public void setLiveImageWallpaper(Activity context, @NonNull InputStream file){
         checkInit();
         try {
-            wallPaper.setImageWallPaper(context.get(),file);
+            wallPaper.setImageWallPaper(context,file);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void setLiveVideoWallpaper(@NonNull File file){
+    public void setLiveVideoWallpaper(Activity context,@NonNull File file){
         checkInit();
         try {
-            wallPaper.setLiveVideoWallpaper(context.get(),file);
+            wallPaper.setLiveVideoWallpaper(context,file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void setLiveImageWallpaper(Fragment context,@NonNull File file){
+        checkInit();
+        try {
+            wallPaper.setImageWallPaper(context,file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setLiveImageWallpaper(Fragment context,@NonNull Bitmap file){
+        checkInit();
+        try {
+            wallPaper.setImageWallPaper(context,file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setLiveImageWallpaper(Fragment context, @NonNull InputStream file){
+        checkInit();
+        try {
+            wallPaper.setImageWallPaper(context,file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setLiveVideoWallpaper(Fragment context, @NonNull File file){
+        checkInit();
+        try {
+            wallPaper.setLiveVideoWallpaper(context,file);
         } catch (Exception e) {
             e.printStackTrace();
         }
