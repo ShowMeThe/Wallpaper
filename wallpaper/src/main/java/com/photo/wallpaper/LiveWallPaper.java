@@ -79,6 +79,7 @@ public class LiveWallPaper extends WallpaperService {
             //未启动
             Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
             intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(context, LiveWallPaper.class));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             if(callBack!=null){
                 callBack.onPaperStart();

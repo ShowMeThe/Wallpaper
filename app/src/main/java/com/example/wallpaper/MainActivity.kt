@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
 
         val manager = WallpaperClient.getClient()
-        manager.doInitFirst(this)
+        manager.doInitFirst(this.applicationContext)
 
         btn.setOnClickListener {
             manager.setLiveImageWallpaper(

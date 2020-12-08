@@ -77,29 +77,17 @@ public class WallpaperClient {
 
     public void setLiveImageWallpaper(@NonNull Bitmap file,ICallBack callBack){
         checkInit();
-        try {
-            wallPaper.setImageWallPaper(context.get(),file,callBack);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        wallPaper.setImageWallPaper(context.get(),file,callBack);
     }
 
     public void setLiveImageWallpaper(@NonNull InputStream file,ICallBack callBack){
         checkInit();
-        try {
-            wallPaper.setImageWallPaper(context.get(),file,callBack);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        wallPaper.setImageWallPaper(context.get(),file,callBack);
     }
 
     public void setLiveVideoWallpaper(@NonNull File file,ICallBack callBack){
         checkInit();
-        try {
-            wallPaper.setLiveVideoWallpaper(context.get(),file,callBack);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        wallPaper.setLiveVideoWallpaper(context.get(),file,callBack);
     }
 
 }
