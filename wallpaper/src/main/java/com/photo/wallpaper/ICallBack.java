@@ -8,6 +8,9 @@ package com.photo.wallpaper;
  */
 public interface ICallBack {
 
-    void onCalled();
+    void onPaperStart();
+
+
+    void onPaperChange();
 
 }

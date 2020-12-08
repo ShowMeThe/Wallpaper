@@ -33,6 +33,8 @@ public class LiveWallPaper extends WallpaperService {
 
     private MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
 
+    private ICallBack iCallBack;
+
     public void volume(@FloatRange(from = 0.0, to = 1.0) float volume) {
         Intent intent = new Intent();
         intent.setAction(WALLPAPER_ACTION);
@@ -68,6 +70,7 @@ public class LiveWallPaper extends WallpaperService {
 
 
     private void createActivity(Context context,ICallBack callBack) {
+        iCallBack = callBack;
         MediaPlayerWrapper wrapper = MediaPlayerWrapper.getInstant();
         if(wrapper.holder == null || !wrapper.holder.getSurface().isValid()){
             surfaceInitialized = false;
@@ -77,10 +80,15 @@ public class LiveWallPaper extends WallpaperService {
             Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
             intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(context, LiveWallPaper.class));
             context.startActivity(intent);
+            if(callBack!=null){
+                callBack.onPaperStart();
+            }
         }else {
             //已启动
             wrapper.initMediaSource(wrapper.holder);
-            callBack.onCalled();
+            if(callBack!=null){
+                callBack.onPaperChange();
+            }
         }
     }
 

@@ -27,8 +27,6 @@ public class WallpaperClient {
 
     private LiveWallPaper wallPaper;
 
-    private int SCREEN_WIDTH = 0;
-    private int SCREEN_HEIGHT = 0;
 
     public static WallpaperClient getClient(){
         if(client == null){
@@ -53,16 +51,7 @@ public class WallpaperClient {
         this.context = new WeakReference<>(context);
         manager = WallpaperManager.getInstance(context);
         wallPaper = new LiveWallPaper();
-        getScreenWH(context);
     }
-
-    private void getScreenWH(Context context){
-        Resources resources = context.getResources();
-        DisplayMetrics dm = resources.getDisplayMetrics();
-        SCREEN_WIDTH = dm.widthPixels;
-        SCREEN_HEIGHT = dm.heightPixels;
-    }
-
 
     public void setImageWallpaper(@NonNull Bitmap bitmap){
         checkInit();
@@ -113,11 +102,4 @@ public class WallpaperClient {
         }
     }
 
-    public int getSCREEN_WIDTH() {
-        return SCREEN_WIDTH;
-    }
-
-    public int getSCREEN_HEIGHT() {
-        return SCREEN_HEIGHT;
-    }
 }
